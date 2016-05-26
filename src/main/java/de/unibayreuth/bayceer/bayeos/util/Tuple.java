@@ -1,5 +1,12 @@
 package de.unibayreuth.bayceer.bayeos.util;
 
+/**
+ * Tuple. Order of X and Y matters.
+ * @author christiane-goehring
+ *
+ * @param <X>
+ * @param <Y>
+ */
 public class Tuple<X, Y> {
 	public final X x;
 	public final Y y;
@@ -21,13 +28,7 @@ public class Tuple<X, Y> {
 		}
 		return super.equals(obj);
 
-		// if (obj instanceof Tuple<?, ?>)
-		// if (((Tuple) obj).x instanceof Integer && ((Tuple) obj).y instanceof
-		// Integer && this.x instanceof Integer
-		// && this.y instanceof Integer)
-		// return (Integer) this.x == ((Tuple) obj).x && (Integer) this.y ==
-		// ((Tuple) obj).y;
-		// return this.x == ((Tuple) obj).x && this.y == ((Tuple) obj).y;
+	
 	}
 
 	@Override

@@ -218,6 +218,25 @@ public class SaxController {
 		return null;
 	}
 
+	/**
+	 * Returns a list of dataseries for two time series with unique IDs in some
+	 * interval. This method is used to receive data for the rickshaw graph on
+	 * the results page.
+	 * 
+	 * @param needle_id
+	 *            Needle ID
+	 * @param needle_from
+	 *            Timestamp from
+	 * @param needle_until
+	 *            Timestamp until
+	 * @param haystack_id
+	 *            Haystack ID
+	 * @param haystack_from
+	 *            Timestamp from
+	 * @param haystack_until
+	 *            Timestamp until
+	 * @return List containing two DataSeries
+	 */
 	@GET
 	@Path("/GetDataToIds/{needle_id}/{needle_from}/{needle_until}/{haystack_id}/{haystack_from}/{haystack_until}")
 	@Produces("application/json")
@@ -254,16 +273,6 @@ public class SaxController {
 			List<DataPoint> needle_data = new ArrayList<>();
 			List<DataPoint> haystack_data = new ArrayList<>();
 
-			// calculate offset if there is data missing
-			// needle_values.next();
-			// haystack_values.next();
-			// long offset_needle = needle_from -
-			// (needle_values.getTimestamp(1).getTime() / 1000);
-			// long offset_haystack = haystack_from -
-			// (haystack_values.getTimestamp(1).getTime() / 1000);
-			//
-			// log.info("offset_needle: "+offset_needle);
-			// log.info("offset_haystack: "+offset_haystack);
 			while (needle_values.next()) {
 				needle_data.add(
 						new DataPoint(haystack_from + ((needle_values.getTimestamp(1).getTime() / 1000) - needle_from),
@@ -273,16 +282,6 @@ public class SaxController {
 				haystack_data.add(
 						new DataPoint(haystack_values.getTimestamp(1).getTime() / 1000, haystack_values.getDouble(2)));
 			}
-			// do {
-			// haystack_data.add(new DataPoint(
-			// haystack_values.getTimestamp(1).getTime() / 1000,
-			// haystack_values.getDouble(2)));
-			// needle_data.add(new DataPoint(
-			// haystack_from
-			// + ((needle_values.getTimestamp(1).getTime() / 1000) -
-			// needle_from),
-			// needle_values.getDouble(2)));
-			// } while (needle_values.next() && haystack_values.next());
 
 			res.add(new DataSeries(needle_description.getString(1), needle_data));
 			res.add(new DataSeries(haystack_description.getString(1), haystack_data));
@@ -294,6 +293,15 @@ public class SaxController {
 		}
 	}
 
+	/**
+	 * Obtains the available Distance Measurement Functions to a certain
+	 * aggregation interval id
+	 * 
+	 * @param aggr_int_id
+	 *            Aggregation Interval ID from bayeos database table
+	 *            sax.aggregation_interval
+	 * @return A List of available Distance Functions
+	 */
 	@GET
 	@Path("/GetDistanceFunctions/{id}")
 	@Produces("application/json")
@@ -327,6 +335,13 @@ public class SaxController {
 		}
 	}
 
+	/**
+	 * Obtains the available aggregation intervals to a certain time series ID
+	 * 
+	 * @param timeSeriesID
+	 *            ID of a time series
+	 * @return A List of available Aggregation Intervals
+	 */
 	@GET
 	@Path("/GetAggregationIntervals/{id}")
 	@Produces("application/json")
@@ -361,6 +376,16 @@ public class SaxController {
 		}
 	}
 
+	/**
+	 * Obtains the unique sax index that belongs to a aggregation-interval-ID
+	 * and distance-function-ID combination
+	 * 
+	 * @param aggr_int_id
+	 *            ID of the aggregation interval
+	 * @param distance_func_id
+	 *            ID of the distance function
+	 * @return The unique sax index that belongs to that tuple
+	 */
 	@GET
 	@Path("/GetSaxIndex/{aggr_int_id}/{distance_func_id}")
 	@Produces("application/json")
@@ -388,47 +413,12 @@ public class SaxController {
 		}
 	}
 
-	// @GET
-	// @Path("/GetSaxIDs/{id}")
-	// @Produces("application/json")
-	// public List<SaxIndex> getSaxIDs(@NotNull @PathParam("id") final Integer
-	// timeSeriesID) {
-	//
-	// try (Connection con = ServletInitializer.getConnection();
-	// PreparedStatement st = con.prepareStatement(
-	// "select id, aggr_int_description, id_sax_limits from
-	// sax.sax_measured_data INNER JOIN sax.sax_index ON
-	// (sax.sax_measured_data.saxtable_id = sax.sax_index.id AND
-	// sax_measured_data.messung_id = "
-	// + timeSeriesID + ")");
-	// ResultSet result = st.executeQuery()) {
-	//
-	// log.debug(st.toString());
-	//
-	// List<SaxIndex> saxIDs = new ArrayList<>();
-	//
-	// while (result.next()) {
-	// try (PreparedStatement st2 = con.prepareStatement(
-	// "select id, name FROM sax.sax_distances WHERE id_sax_limits = " +
-	// result.getInt(3));
-	// ResultSet result2 = st2.executeQuery()) {
-	// result2.next();
-	//
-	// SaxIndex id = new SaxIndex(result.getInt(1), result.getString(2),
-	// result.getInt(3),
-	// result2.getInt(1), result2.getString(2));
-	// saxIDs.add(id);
-	// }
-	// }
-	//
-	// return saxIDs;
-	//
-	// } catch (SQLException e) {
-	// log.error(e.getMessage());
-	// throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-	// }
-	// }
-
+	/**
+	 * Reads request parameters needed for the SAX similarity search algorithm
+	 * and then executes the search.
+	 * 
+	 * @return The results of that search in the form of a SaxResult object.
+	 */
 	@GET
 	@Path("/SAX")
 	@Produces("application/json")
@@ -479,7 +469,7 @@ public class SaxController {
 		int aggr_int_seconds = get_agg_int_in_seconds(aggr_int_id);
 
 		// get from and until of available sax series
-		MirroredTuple<DateTime[], DateTime[]> haystacks_from_until = getHaystacks_FromUntil(haystack_ids, sax_index,
+		Tuple<DateTime[], DateTime[]> haystacks_from_until = getHaystacks_FromUntil(haystack_ids, sax_index,
 				haystack_min_from, haystack_max_until);
 		DateTime[] haystack_from = haystacks_from_until.x, haystack_until = haystacks_from_until.y;
 
@@ -507,7 +497,22 @@ public class SaxController {
 		return sax;
 	}
 
-	private static MirroredTuple<DateTime[], DateTime[]> getHaystacks_FromUntil(int[] haystack_ids, int sax_index,
+	/**
+	 * Returns the actually available from- and until-timestamps in a given
+	 * interval.
+	 * 
+	 * @param haystack_ids
+	 *            Array of the time series IDs
+	 * @param sax_index
+	 *            The used SAX index
+	 * @param haystack_min_from
+	 *            Timestamp
+	 * @param haystack_max_until
+	 *            Timestamp
+	 * @return A tuple that contains the available from-timestamps (ge.
+	 *         haystack_min_from) and until-timestamp (le.haystack_max_until)
+	 */
+	private static Tuple<DateTime[], DateTime[]> getHaystacks_FromUntil(int[] haystack_ids, int sax_index,
 			DateTime haystack_min_from, DateTime haystack_max_until) {
 		DateTime[] haystack_from = new DateTime[haystack_ids.length],
 				haystack_until = new DateTime[haystack_ids.length];
@@ -539,9 +544,17 @@ public class SaxController {
 				throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
 			}
 		}
-		return new MirroredTuple<DateTime[], DateTime[]>(haystack_from, haystack_until);
+		return new Tuple<DateTime[], DateTime[]>(haystack_from, haystack_until);
 	}
 
+	/**
+	 * Obtains a hashmap mapping all SAX-letter-combinations to a distance value
+	 * 
+	 * @param distance_func_id
+	 *            The used distance function ID
+	 * @return A hashmap containing all SAX-letter-combinations and their
+	 *         distance value.
+	 */
 	private static HashMap<MirroredTuple<Character, Character>, Double> getDistanceTableToSaxIndex(
 			int distance_func_id) {
 		HashMap<MirroredTuple<Character, Character>, Double> saxdistance = new HashMap<MirroredTuple<Character, Character>, Double>();
@@ -567,6 +580,13 @@ public class SaxController {
 		return saxdistance;
 	}
 
+	/**
+	 * Obtains the seconds of a certain aggregation interval
+	 * 
+	 * @param aggr_int_id
+	 *            The ID of the aggregation interval
+	 * @return The corresponding number of seconds
+	 */
 	public static int get_agg_int_in_seconds(int aggr_int_id) {
 		int res = 0;
 
@@ -586,6 +606,15 @@ public class SaxController {
 		return res;
 	}
 
+	/**
+	 * Obtains the number of indices to shift the time window by
+	 * 
+	 * @param aggr_int_id
+	 *            The used aggregation interval ID
+	 * @param shiftby
+	 *            Given in Postgresql Interval Format (eg. "1 day", "6 hours"..)
+	 * @return The number of indices that the time window needs to be shift by
+	 */
 	public static int get_no_shiftby(int aggr_int_id, String shiftby) {
 		//
 		int res = 0;
@@ -606,6 +635,12 @@ public class SaxController {
 		return res;
 	}
 
+	/**
+	 * Obtains approriate settings depending on the length of the needle and
+	 * haystacks
+	 * 
+	 * @return
+	 */
 	@GET
 	@Path("/SAXSettings")
 	@Produces("application/json")
@@ -673,8 +708,6 @@ public class SaxController {
 		long needlePeriod_seconds = needle_until_seconds - needle_from_seconds;
 
 		// calculate upper bound of total haystack period
-		// long haystacksPeriod_seconds = (haystack_max_until_seconds -
-		// haystack_min_from_seconds) * haystack_ids.length;
 		long haystackPeriod_seconds = haystack_max_until_seconds - haystack_min_from_seconds;
 
 		int aggr_int_seconds = 0;
@@ -696,33 +729,6 @@ public class SaxController {
 					aggr_int_seconds = available_aggr_int_seconds[i];
 					aggr_int_id = available_aggr_int_id[i];
 
-					maxNoOfOperations = maxNoOfOperations / aggr_int_seconds;
-
-					log.info("No Of Operations:" + maxNoOfOperations);
-
-					for (int j = 0; j < available_shiftby.size(); j++) {
-						log.info("Shiftby " + available_shiftby.get(j).getDescription() + " :"
-								+ maxNoOfOperations * aggr_int_seconds / available_shiftby.get(j).getSeconds());
-						if (maxNoOfOperations * aggr_int_seconds / available_shiftby.get(j).getSeconds() < 1500000000
-								|| j == available_shiftby.size() - 1) {
-							shiftby = available_shiftby.get(j);
-							break;
-
-						}
-					}
-
-					List<SaxDistanceFunction> available_distancefunc = available_distance_func_id
-							.get(available_aggr_int_id[i]);
-					if (available_distancefunc.contains(new SaxDistanceFunction(2, "MaxDist"))) {
-						distanceTable_id = 2;
-						distanceTable_name = "MaxDist";
-					} else {
-						distanceTable_id = 1;
-						distanceTable_name = "MinDist";
-					}
-
-					sax_index = available_saxindex
-							.get(new Tuple<Integer, Integer>(available_aggr_int_id[i], distanceTable_id));
 					break;
 				}
 			}
@@ -735,34 +741,6 @@ public class SaxController {
 					aggr_int_seconds = available_aggr_int_seconds[i];
 					aggr_int_id = available_aggr_int_id[i];
 
-					maxNoOfOperations = maxNoOfOperations / aggr_int_seconds;
-
-					log.info("No Of Operations:" + maxNoOfOperations);
-
-					for (int j = 0; j < available_shiftby.size(); j++) {
-						log.info("Shiftby " + available_shiftby.get(j).getDescription() + " :"
-								+ maxNoOfOperations * aggr_int_seconds / available_shiftby.get(j).getSeconds());
-						if (maxNoOfOperations * aggr_int_seconds / available_shiftby.get(j).getSeconds() < 1500000000
-								|| j == available_shiftby.size() - 1) {
-							shiftby = available_shiftby.get(j);
-							break;
-
-						}
-					}
-
-					List<SaxDistanceFunction> available_distancefunc = available_distance_func_id
-							.get(available_aggr_int_id[i]);
-					if (available_distancefunc.contains(new SaxDistanceFunction(2, "MaxDist"))) {
-						distanceTable_id = 2;
-						distanceTable_name = "MaxDist";
-					} else {
-						distanceTable_id = 1;
-						distanceTable_name = "MinDist";
-					}
-
-					sax_index = available_saxindex
-							.get(new Tuple<Integer, Integer>(available_aggr_int_id[i], distanceTable_id));
-
 					break;
 				}
 			}
@@ -773,34 +751,6 @@ public class SaxController {
 				if (available_aggr_int_seconds[i] == 3600) {
 					aggr_int_seconds = available_aggr_int_seconds[i];
 					aggr_int_id = available_aggr_int_id[i];
-
-					maxNoOfOperations = maxNoOfOperations / aggr_int_seconds;
-
-					log.info("No Of Operations:" + maxNoOfOperations);
-
-					for (int j = 0; j < available_shiftby.size(); j++) {
-						log.info("Shiftby " + available_shiftby.get(j).getDescription() + " :"
-								+ maxNoOfOperations * aggr_int_seconds / available_shiftby.get(j).getSeconds());
-						if (maxNoOfOperations * aggr_int_seconds / available_shiftby.get(j).getSeconds() < 1500000000
-								|| j == available_shiftby.size() - 1) {
-							shiftby = available_shiftby.get(j);
-							break;
-
-						}
-					}
-
-					List<SaxDistanceFunction> available_distancefunc = available_distance_func_id
-							.get(available_aggr_int_id[i]);
-					if (available_distancefunc.contains(new SaxDistanceFunction(2, "MaxDist"))) {
-						distanceTable_id = 2;
-						distanceTable_name = "MaxDist";
-					} else {
-						distanceTable_id = 1;
-						distanceTable_name = "MinDist";
-					}
-
-					sax_index = available_saxindex
-							.get(new Tuple<Integer, Integer>(available_aggr_int_id[i], distanceTable_id));
 
 					break;
 				}
@@ -813,34 +763,6 @@ public class SaxController {
 					aggr_int_seconds = available_aggr_int_seconds[i];
 					aggr_int_id = available_aggr_int_id[i];
 
-					maxNoOfOperations = maxNoOfOperations / aggr_int_seconds;
-
-					log.info("No Of Operations:" + maxNoOfOperations);
-
-					for (int j = 0; j < available_shiftby.size(); j++) {
-						log.info("Shiftby " + available_shiftby.get(j).getDescription() + " :"
-								+ maxNoOfOperations * aggr_int_seconds / available_shiftby.get(j).getSeconds());
-						if (maxNoOfOperations * aggr_int_seconds / available_shiftby.get(j).getSeconds() < 1500000000
-								|| j == available_shiftby.size() - 1) {
-							shiftby = available_shiftby.get(j);
-							break;
-
-						}
-					}
-
-					List<SaxDistanceFunction> available_distancefunc = available_distance_func_id
-							.get(available_aggr_int_id[i]);
-					if (available_distancefunc.contains(new SaxDistanceFunction(2, "MaxDist"))) {
-						distanceTable_id = 2;
-						distanceTable_name = "MaxDist";
-					} else {
-						distanceTable_id = 1;
-						distanceTable_name = "MinDist";
-					}
-
-					sax_index = available_saxindex
-							.get(new Tuple<Integer, Integer>(available_aggr_int_id[i], distanceTable_id));
-
 					break;
 				}
 			}
@@ -852,34 +774,6 @@ public class SaxController {
 					aggr_int_seconds = available_aggr_int_seconds[i];
 					aggr_int_id = available_aggr_int_id[i];
 
-					maxNoOfOperations = maxNoOfOperations / aggr_int_seconds;
-
-					log.info("No Of Operations:" + maxNoOfOperations);
-
-					for (int j = 0; j < available_shiftby.size(); j++) {
-						log.info("Shiftby " + available_shiftby.get(j).getDescription() + " :"
-								+ maxNoOfOperations * aggr_int_seconds / available_shiftby.get(j).getSeconds());
-						if (maxNoOfOperations * aggr_int_seconds / available_shiftby.get(j).getSeconds() < 1500000000
-								|| j == available_shiftby.size() - 1) {
-							shiftby = available_shiftby.get(j);
-							break;
-
-						}
-					}
-
-					List<SaxDistanceFunction> available_distancefunc = available_distance_func_id
-							.get(available_aggr_int_id[i]);
-					if (available_distancefunc.contains(new SaxDistanceFunction(2, "MaxDist"))) {
-						distanceTable_id = 2;
-						distanceTable_name = "MaxDist";
-					} else {
-						distanceTable_id = 1;
-						distanceTable_name = "MinDist";
-					}
-
-					sax_index = available_saxindex
-							.get(new Tuple<Integer, Integer>(available_aggr_int_id[i], distanceTable_id));
-
 					break;
 				}
 			}
@@ -890,34 +784,6 @@ public class SaxController {
 				if (available_aggr_int_seconds[i] == 21600) {
 					aggr_int_seconds = available_aggr_int_seconds[i];
 					aggr_int_id = available_aggr_int_id[i];
-
-					maxNoOfOperations = maxNoOfOperations / aggr_int_seconds;
-
-					log.info("No Of Operations:" + maxNoOfOperations);
-
-					for (int j = 0; j < available_shiftby.size(); j++) {
-						log.info("Shiftby " + available_shiftby.get(j).getDescription() + " :"
-								+ maxNoOfOperations * aggr_int_seconds / available_shiftby.get(j).getSeconds());
-						if (maxNoOfOperations * aggr_int_seconds / available_shiftby.get(j).getSeconds() < 1500000000
-								|| j == available_shiftby.size() - 1) {
-							shiftby = available_shiftby.get(j);
-							break;
-
-						}
-					}
-
-					List<SaxDistanceFunction> available_distancefunc = available_distance_func_id
-							.get(available_aggr_int_id[i]);
-					if (available_distancefunc.contains(new SaxDistanceFunction(2, "MaxDist"))) {
-						distanceTable_id = 2;
-						distanceTable_name = "MaxDist";
-					} else {
-						distanceTable_id = 1;
-						distanceTable_name = "MinDist";
-					}
-
-					sax_index = available_saxindex
-							.get(new Tuple<Integer, Integer>(available_aggr_int_id[i], distanceTable_id));
 
 					break;
 				}
@@ -931,34 +797,6 @@ public class SaxController {
 					aggr_int_seconds = available_aggr_int_seconds[i];
 					aggr_int_id = available_aggr_int_id[i];
 
-					maxNoOfOperations = maxNoOfOperations / aggr_int_seconds;
-
-					log.info("No Of Operations:" + maxNoOfOperations);
-
-					for (int j = 0; j < available_shiftby.size(); j++) {
-						log.info("Shiftby " + available_shiftby.get(j).getDescription() + " :"
-								+ maxNoOfOperations * aggr_int_seconds / available_shiftby.get(j).getSeconds());
-						if (maxNoOfOperations * aggr_int_seconds / available_shiftby.get(j).getSeconds() < 1500000000
-								|| j == available_shiftby.size() - 1) {
-							shiftby = available_shiftby.get(j);
-							break;
-
-						}
-					}
-
-					List<SaxDistanceFunction> available_distancefunc = available_distance_func_id
-							.get(available_aggr_int_id[i]);
-					if (available_distancefunc.contains(new SaxDistanceFunction(2, "MaxDist"))) {
-						distanceTable_id = 2;
-						distanceTable_name = "MaxDist";
-					} else {
-						distanceTable_id = 1;
-						distanceTable_name = "MinDist";
-					}
-
-					sax_index = available_saxindex
-							.get(new Tuple<Integer, Integer>(available_aggr_int_id[i], distanceTable_id));
-
 					break;
 				}
 			}
@@ -969,39 +807,38 @@ public class SaxController {
 					aggr_int_seconds = available_aggr_int_seconds[i];
 					aggr_int_id = available_aggr_int_id[i];
 
-					maxNoOfOperations = maxNoOfOperations / aggr_int_seconds;
-					log.info("No Of Operations:" + maxNoOfOperations);
-
-					for (int j = 0; j < available_shiftby.size(); j++) {
-						log.info("Shiftby " + available_shiftby.get(j).getDescription() + " :"
-								+ maxNoOfOperations * aggr_int_seconds / available_shiftby.get(j).getSeconds());
-						if (maxNoOfOperations * aggr_int_seconds / available_shiftby.get(j).getSeconds() < 1500000000
-								|| j == available_shiftby.size() - 1) {
-							shiftby = available_shiftby.get(j);
-							break;
-						}
-					}
-
-					List<SaxDistanceFunction> available_distancefunc = available_distance_func_id
-							.get(available_aggr_int_id[i]);
-					if (available_distancefunc.contains(new SaxDistanceFunction(2, "MaxDist"))) {
-						distanceTable_id = 2;
-						distanceTable_name = "MaxDist";
-					} else {
-						distanceTable_id = 1;
-						distanceTable_name = "MinDist";
-					}
-
-					sax_index = available_saxindex
-							.get(new Tuple<Integer, Integer>(available_aggr_int_id[i], distanceTable_id));
-
 					break;
 				}
 			}
 		}
+		maxNoOfOperations = maxNoOfOperations / aggr_int_seconds;
+
+		log.info("No Of Operations:" + maxNoOfOperations);
+
+		for (int j = 0; j < available_shiftby.size(); j++) {
+			log.info("Shiftby " + available_shiftby.get(j).getDescription() + " :"
+					+ maxNoOfOperations * aggr_int_seconds / available_shiftby.get(j).getSeconds());
+			if (maxNoOfOperations * aggr_int_seconds / available_shiftby.get(j).getSeconds() < 1500000000
+					|| j == available_shiftby.size() - 1) {
+				shiftby = available_shiftby.get(j);
+				break;
+
+			}
+		}
+
+		List<SaxDistanceFunction> available_distancefunc = available_distance_func_id.get(aggr_int_id);
+		if (available_distancefunc.contains(new SaxDistanceFunction(2, "MaxDist"))) {
+			distanceTable_id = 2;
+			distanceTable_name = "MaxDist";
+		} else {
+			distanceTable_id = 1;
+			distanceTable_name = "MinDist";
+		}
+
+		sax_index = available_saxindex.get(new Tuple<Integer, Integer>(aggr_int_id, distanceTable_id));
 
 		SaxProperties prop = new SaxProperties(new SaxAggregationInterval(aggr_int_id, aggr_int_seconds), shiftby,
-				new SaxDistanceFunction(distanceTable_id, distanceTable_name), sax_index, 0.2, 15);
+				new SaxDistanceFunction(distanceTable_id, distanceTable_name), sax_index, 0.2, 30);
 
 		return prop;
 	}

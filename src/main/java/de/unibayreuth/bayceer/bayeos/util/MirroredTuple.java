@@ -1,5 +1,12 @@
 package de.unibayreuth.bayceer.bayeos.util;
 
+/**
+ * Tuple where the order of X and Y doesn't matter
+ * @author christiane-goehring
+ *
+ * @param <X>
+ * @param <Y>
+ */
 public class MirroredTuple<X, Y> {
 	public final X x;
 	public final Y y;

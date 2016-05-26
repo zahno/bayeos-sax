@@ -123,7 +123,9 @@ public class SaxController {
 			@NotNull @PathParam("from") final Integer from, @NotNull @PathParam("until") final Integer until) {
 
 		String bestTable = getAppropriateTable(id, from, until);
-
+		if (bestTable == null) {
+			return null;
+		}
 		try (Connection con = ServletInitializer.getConnection();
 				PreparedStatement st = con.prepareStatement("select von, wert from " + bestTable + " WHERE id = " + id
 						+ " AND von >= to_timestamp(" + from + ") AND von <= to_timestamp(" + until + ")");
@@ -141,12 +143,13 @@ public class SaxController {
 			while (result.next()) {
 				data.add(new DataPoint(result.getTimestamp(1).getTime() / 1000, result.getDouble(2)));
 			}
-
-			return new DataSeries(resultSet_messreihenBezeichnung.getString(1), data);
+			if (!data.isEmpty())
+				return new DataSeries(resultSet_messreihenBezeichnung.getString(1), data);
 		} catch (SQLException e) {
 			log.error(e.getMessage());
 			throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
 		}
+		return null;
 	}
 
 	/**
@@ -684,8 +687,8 @@ public class SaxController {
 		for (Entry<Integer, List<SaxDistanceFunction>> entry : entrySet) {
 
 			for (SaxDistanceFunction func : (List<SaxDistanceFunction>) entry.getValue()) {
-				available_saxindex.put((new Tuple<Integer, Integer>((int) entry.getKey(), func.getDistances_id())),
-						getSaxIndex((int) entry.getKey(), func.getDistances_id()));
+				available_saxindex.put((new Tuple<Integer, Integer>((int) entry.getKey(), func.getId())),
+						getSaxIndex((int) entry.getKey(), func.getId()));
 			}
 		}
 

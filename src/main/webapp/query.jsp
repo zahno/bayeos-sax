@@ -7,71 +7,53 @@
 
 
 <meta name="layout" content="main">
+
+
+<link rel="stylesheet"
+	href="${ctx}/javascript/jquery-ui/css/smoothness/jquery-ui.min.css">
 <link rel="stylesheet" type="text/css"
 	href="${ctx}/css/bootstrap.min.css">
-
 <link rel="stylesheet" type="text/css" href="${ctx}/js/rickshaw.min.css">
-
 <link rel="stylesheet" href="${ctx}/css/main.css">
 <link rel="stylesheet"
 	href="${ctx}/javascript/jquery-ui/css/smoothness/jquery-ui.min.css">
-
-
-
-<script
-	src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-
-<script type="text/javascript"
-	src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js">
-	
-</script>
-<script type="text/javascript"
-	src="http://tarruda.github.com/bootstrap-datetimepicker/assets/js/bootstrap-datetimepicker.min.js">
-	
-</script>
-<script type="text/javascript"
-	src="http://tarruda.github.com/bootstrap-datetimepicker/assets/js/bootstrap-datetimepicker.pt-BR.js">
-	
-</script>
-
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet"
+	href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.min.css">
 
 
 
 <script src="${ctx}/javascript/jquery/jquery.min.js"></script>
 <script src="${ctx}/javascript/jquery-ui/jquery-ui.min.js"></script>
-<script src="${ctx}/js/d3.min.js"></script>
-<script src="${ctx}/js/rickshaw.min.js"></script>
-<script src="${ctx}/javascript/servletFunctions.js"></script>
-<script src="${ctx}/javascript/moment.js"></script>
-
-
-
-
-<!-- Latest compiled and minified CSS -->
-<link rel="stylesheet"
-	href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.min.css">
-
-<!-- Latest compiled and minified JavaScript -->
-<script
-	src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.min.js"></script>
-
-<!-- Latest compiled and minified Locales -->
-<script
-	src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/locale/bootstrap-table-zh-CN.min.js"></script>
-
-<link rel="stylesheet"
-	href="${ctx}/javascript/jquery-ui/css/smoothness/jquery-ui.min.css">
-
-
-
 <script src="${ctx}/js/jquery.plugin.js"></script>
 <script src="${ctx}/js/jquery.datetimeentry.js"></script>
 
-
-
-
 </head>
 <body>
+
+	<!-- Modal Start here-->
+	<div class="modal fade bs-example-modal-sm" id="pleaseWait"
+		tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+		<div class="modal-dialog modal-sm">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title">
+						<span class="glyphicon glyphicon-time"> </span> Please Wait
+					</h4>
+				</div>
+				<div class="modal-body">
+					<div class="progress">
+						<div
+							class="progress-bar progress-bar-info
+                    progress-bar-striped active"
+							style="width: 100%"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Modal ends Here -->
+
 
 	<div id="wrap">
 		<nav class="navbar navbar-default">
@@ -106,7 +88,7 @@
 					<div class="block">
 						<div class="block-header">Needle</div>
 						<div class="group">
-							<h4>Define time series to search for:</h4>
+							<h4>Determine a time series to search for:</h4>
 							<table id="needleTable" data-locale="en-US" data-toggle="table"
 								data-click-to-select="true" data-sort-name="id"
 								data-select-item-name="myRadioName"
@@ -140,43 +122,39 @@
 						</div>
 						<div class="row">
 							<br>
-							<div class="col-md-6">
+							<div class="col-md-8">
 								<div id="legend0"></div>
 
 							</div>
-							<div class="col-md-6">
+							<div class="col-md-4">
 								<div class="btn-group"></div>
-								<a href="?move=-1" class="btn btn-default"><span
+								<a class="btn btn-default" onclick="needle_back();"><span
 									class="glyphicon glyphicon-arrow-left"></span> <span
-									class="hidden-xs">back</span></a> <a href="?move=+1"
-									class="btn btn-default"><span
+									class="hidden-xs">back</span></a> <a class="btn btn-default"
+									onclick="needle_forward();"><span
 									class="glyphicon glyphicon-arrow-right"></span> <span
-									class="hidden-xs">forward</span></a> <a href="?zoom=+1"
-									class="btn btn-default"><span
-									class="glyphicon glyphicon-zoom-in"></span> <span
-									class="hidden-xs">Zoom in</span></a> <a href="?zoom=-1"
-									class="btn btn-default"><span
-									class="glyphicon glyphicon-zoom-out"></span> <span
-									class="hidden-xs">Zoom out</span></a>
+									class="hidden-xs">forward</span></a>
+
 								<div class="btn-group">
 									<button type="button" class="btn btn-default dropdown-toggle"
 										data-toggle="dropdown">
 										<span class="glyphicon glyphicon-resize-horizontal"></span>
 										Interval <span class="caret"></span>
 									</button>
-									<ul class="dropdown-menu" role="menu">
-										<li><a href="?interval=today">today</a></li>
-										<li><a href="?interval=last+24+hours">last 24 hours</a></li>
-										<li><a href="?interval=last+3+days">last 3 days</a></li>
-										<li><a href="?interval=last+7+days">last 7 days</a></li>
-										<li><a href="?interval=last+30+days">last 30 days</a></li>
-										<li><a href="?interval=yesterday">yesterday</a></li>
-										<li><a href="?interval=this+week">this week</a></li>
-										<li><a href="?interval=last+week">last week</a></li>
-										<li><a href="?interval=this+month">this month</a></li>
-										<li><a href="?interval=last+month">last month</a></li>
-										<li><a href="?interval=this+year">this year</a></li>
-										<li><a href="?interval=last+year">last year</a></li>
+
+									<ul class="dropdown-menu" role="menu" id="interval">
+										<li><a onclick="needle_interval(1);">today</a></li>
+										<li><a onclick="needle_interval(2);">last 24 hours</a></li>
+										<li><a onclick="needle_interval(3);">last 3 days</a></li>
+										<li><a onclick="needle_interval(4);">last 7 days</a></li>
+										<li><a onclick="needle_interval(5);">last 30 days</a></li>
+										<li><a onclick="needle_interval(6);">yesterday</a></li>
+										<li><a onclick="needle_interval(7);">this week</a></li>
+										<li><a onclick="needle_interval(8);">last week</a></li>
+										<li><a onclick="needle_interval(9);">this month</a></li>
+										<li><a onclick="needle_interval(10);">last month</a></li>
+										<li><a onclick="needle_interval(11);">this year</a></li>
+										<li><a onclick="needle_interval(12);">last year</a></li>
 									</ul>
 								</div>
 							</div>
@@ -308,14 +286,14 @@
 							<div class="radio col-xs-12">
 								<label> <input type="radio" name="radios"
 									class="track-order-change" id="defaultSettings" value=""
-									checked="checked"> <b>Use recommended settings</b>
+									checked="checked"> <b>Use auto settings</b>
 								</label>
 							</div>
 
 							<div class="radio col-xs-12">
 								<label> <input type="radio" name="radios"
-									class="track-order-change" id="expertSettings"><b>Use
-										own settings </b>
+									class="track-order-change" id="expertSettings"><b>Select
+										settings </b>
 								</label>
 							</div>
 							<div class="col-sm-1"></div>
@@ -459,15 +437,23 @@
 												title : 'Shift By',
 												sortable : true
 											}, {
+												field : 'distance_func',
+												title : 'Distance Method'
+											}, {
 												field : 'missing_values',
 												title : 'Max. Missing Values',
 												sortable : true
+											}, {
+												field : "remove",
+												formatter : "actionFormatter",
+												events : "actionEvents"
 											} ],
 											uniqueId : 'queryid',
 											sortName : 'queryid',
 											sortOrder : 'desc',
 											detailView : true,
 											locale : 'en-US',
+
 											onExpandRow : function(index, row,
 													$detail) {
 												$detail
@@ -486,9 +472,14 @@
 																			},
 
 																			{
-																				field : 'distance',
+																				field : 'distance_formatted',
 																				title : 'Distance',
 																				sortable : true
+																			},
+																			{
+																				field : 'distance',
+																				visible : false
+
 																			},
 																			{
 																				field : 'h_name',
@@ -537,6 +528,20 @@
 											}
 										});
 							});
+
+							function actionFormatter(value, row, index) {
+								return [
+										'<a class="remove ml10" href="javascript:void(0)" title="Remove">',
+										'<i class="glyphicon glyphicon-remove"></i>',
+										'</a>' ].join('');
+							}
+
+							window.actionEvents = {
+								'click .remove' : function(e, value, row, index) {
+									$('#deleteDialogModal').data('row', row)
+											.modal('show');
+								}
+							};
 						</script>
 
 					</div>
@@ -550,11 +555,47 @@
 
 
 
+	<!-- start: Delete Coupon Modal -->
+	<div class="modal fade" id="deleteDialogModal" tabindex="-1"
+		role="dialog" aria-labelledby="deleteDialogModalLabel"
+		aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-hidden="true">&times;</button>
+					<h3 class="modal-title" id="deleteDialogModalLabel">Warning!</h3>
+
+				</div>
+				<div class="modal-body">
+					<h4>Are you sure you want to delete this result?</h4>
+
+				</div>
+				<!--/modal-body-collapse -->
+				<div class="modal-footer">
+					<button type="button" class="btn btn-danger" id="btnDelteYes">Yes</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+				</div>
+				<!--/modal-footer-collapse -->
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal-dialog -->
+	</div>
+	<!-- /.modal -->
+	<script type="text/javascript">
+		$('#btnDelteYes').click(function() {
+			var row = $('#deleteDialogModal').data('row');
+			$('#resulttable').bootstrapTable('remove', {
+				field : 'queryid',
+				values : [ row.queryid ]
+			});
+			$('#deleteDialogModal').modal('hide');
+		});
+	</script>
 
 
 
-	<script src="js/bundle-bundle_bootstrap_defer.js"
-		type="text/javascript"></script>
 	<div id="footer">
 
 		<p class="text-muted credit">
@@ -565,6 +606,28 @@
 				href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>
 		</p>
 	</div>
+
+
+
+	<!-- Latest compiled and minified JavaScript -->
+	<script
+		src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.min.js"></script>
+
+	<script type="text/javascript"
+		src="http://tarruda.github.com/bootstrap-datetimepicker/assets/js/bootstrap-datetimepicker.min.js">
+		
+	</script>
+
+	<script src="${ctx}/js/d3.min.js"></script>
+	<script src="${ctx}/js/rickshaw.min.js"></script>
+	<script src="${ctx}/javascript/moment.js"></script>
+
+	<script src="${ctx}/javascript/servletFunctions.js"></script>
+	<script type="text/javascript"
+		src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js">
+		<script src="js/bundle-bundle_bootstrap_defer.js"
+	type="text/javascript">
+	</script>
 </body>
 </html>
 

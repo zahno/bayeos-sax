@@ -1,8 +1,3 @@
-/**
- * Query tab: Fills up the dropdown menu to choose needle time series from with
- * available sax time series
- */
-
 var resultGraphData = new Array();
 var resultGraph;
 var needleGraphData = new Array();
@@ -129,7 +124,11 @@ function updateGraph(graph, graphData, newData, divlegend, divpreview) {
 }
 
 $(document).ready(
+
 		function() {
+			$('#pleaseWait').modal('show');
+
+			$("body").toggleClass("wait");
 
 			initiateGraph(needleGraphData, "#chart0", 'timeline0');
 			initiateGraph(resultGraphData, "#chart1", 'timeline1');
@@ -194,12 +193,16 @@ $(document).ready(
 					// setSaxIds(values.id);
 					setAggregationIntervals(values.id);
 					set_haystack_from_until();
+
+					$('#pleaseWait').modal('hide');
 				}
 			});
 		});
 
 $(document).ready(function() {
 	$('#needleTable').click(function() {
+		$("body").toggleClass("wait");
+
 		var values = $('#needleTable').bootstrapTable('getSelections')[0];
 		loadNeedleGraph(values.id, values.from_seconds, values.until_seconds);
 		// setSaxIds(values.id);
@@ -210,6 +213,7 @@ $(document).ready(function() {
 
 function loadResultGraph(needle_id, needle_from, needle_until, haystack_id,
 		haystack_from, haystack_until) {
+	$("body").toggleClass("wait");
 
 	$.ajax({
 		type : "GET",
@@ -219,6 +223,8 @@ function loadResultGraph(needle_id, needle_from, needle_until, haystack_id,
 
 		dataType : "json",
 		success : function(data) {
+			$("body").toggleClass("wait");
+
 			var newData = [ {
 				name : data[1].name,
 				data : data[1].data,
@@ -246,11 +252,152 @@ function resultChecked(e, row) {
 }
 
 function update() {
+	$("body").toggleClass("wait");
+
 	var from = moment($('#from').val()).toDate().getTime() / 1000;
 	var until = moment($('#until').val()).toDate().getTime() / 1000;
 
 	loadNeedleGraph($('#needleTable').bootstrapTable('getSelections')[0].id,
 			from, until);
+}
+function needle_back() {
+	$("body").toggleClass("wait");
+
+	var from = moment($('#from').val()).toDate().getTime();
+	var until = moment($('#until').val()).toDate().getTime();
+
+	var interval = until - from;
+
+	from = from - interval / 3;
+	from = new Date(from);
+	from.setMinutes(0, 0, 0);
+
+	until = until - interval / 3;
+	until = new Date(until);
+	until.setMinutes(0, 0, 0);
+
+	from = from.getTime() / 1000;
+	until = until.getTime() / 1000;
+
+	loadNeedleGraph($('#needleTable').bootstrapTable('getSelections')[0].id,
+			from, until);
+}
+
+function needle_forward() {
+	$("body").toggleClass("wait");
+
+	var from = moment($('#from').val()).toDate().getTime();
+	var until = moment($('#until').val()).toDate().getTime();
+
+	var interval = until - from;
+
+	from = from + interval / 3;
+	from = new Date(from);
+	from.setMinutes(0, 0, 0);
+
+	until = until + interval / 3;
+	until = new Date(until);
+	until.setMinutes(0, 0, 0);
+
+	from = from.getTime() / 1000;
+	until = until.getTime() / 1000;
+
+	loadNeedleGraph($('#needleTable').bootstrapTable('getSelections')[0].id,
+			from, until);
+}
+
+function needle_interval(interval) {
+	$("body").toggleClass("wait");
+	var until = new Date();
+	until.setSeconds(0, 0);
+	if (interval == 1) {
+		var from = getToday();
+	} else if (interval == 2) {
+		var from = getLast24Hours();
+	} else if (interval == 3) {
+		var from = getLast3Days();
+	} else if (interval == 4) {
+		var from = getLast7Days();
+	} else if (interval == 5) {
+		var from = getLast30Days();
+	} else if (interval == 6) {
+		var from = getYesterday();
+		var until = getYesterday();
+		until.setHours(24, 0, 0, 0);
+	} else if (interval == 7) {
+		var from = getFirstDayOfThisWeek();
+	} else if (interval == 8) {
+		from = new Date(until.setDate(from.getDate() - 7));
+	} else if (interval == 9) {
+		from = new Date(until.getFullYear(), until.getMonth(), 1);
+	} else if (interval == 10) {
+		var from = new Date(until.getFullYear(), until.getMonth() - 1, 1);
+		until = new Date(until.getFullYear(), until.getMonth(), 1);
+	} else if (interval == 11) {
+		from = new Date(until.getFullYear(), 0);
+	} else if (interval == 12) {
+		from = new Date(until.getFullYear() - 1, 0);
+		until = new Date(until.getFullYear(), 0);
+	}
+	from = from.getTime() / 1000;
+	until = until.getTime() / 1000;
+
+	loadNeedleGraph($('#needleTable').bootstrapTable('getSelections')[0].id,
+			from, until);
+}
+
+function getToday() {
+	var d = new Date();
+	d.setHours(0, 0, 0, 0);
+	return d;
+}
+
+function getLast24Hours() {
+	var d = new Date();
+
+	var last24Hours = new Date(d.getFullYear(), d.getMonth(), d.getDate() - 1);
+	last24Hours.setHours(d.getHours(), d.getMinutes(), 0, 0);
+	return last24Hours;
+}
+
+function getLast3Days() {
+	var now = new Date();
+	var last3days = new Date(now.getFullYear(), now.getMonth(),
+			now.getDate() - 3);
+	last3days.setHours(now.getHours(), now.getMinutes(), 0, 0);
+	return last3days;
+}
+
+function getLast7Days() {
+	var now = new Date();
+	var last7days = new Date(now.getFullYear(), now.getMonth(),
+			now.getDate() - 7);
+	last7days.setHours(now.getHours(), now.getMinutes(), 0, 0);
+	return last7days;
+}
+function getLast30Days() {
+	var now = new Date();
+	var last30days = new Date(now.getFullYear(), now.getMonth() - 1, now
+			.getDate() - 30);
+	last30days.setHours(now.getHours(), now.getMinutes(), 0, 0);
+
+	return last30days;
+}
+
+function getYesterday() {
+	var d = new Date();
+	var res = new Date(d.getFullYear(), d.getMonth(), d.getDate() - 1);
+	res.setHours(0, 0, 0, 0);
+	return res;
+}
+
+function getFirstDayOfThisWeek() {
+	var curr = new Date(); // get current date
+	var first = curr.getDate() - curr.getDay(); // First day is the day of the
+	// month - the day of the week
+	first = new Date(curr.setDate(first));
+	first.setHours(0, 0, 0, 0);
+	return first;
 }
 
 function addLeadingZeros(number, length) {
@@ -302,6 +449,10 @@ function set_haystack_from_until() {
  * 
  */
 function loadNeedleGraph(id, from, until) {
+	if (until < from) {
+		until = from + 24 * 60 * 60;
+	}
+
 	set_from_until(null, from, until);
 
 	$.ajax({
@@ -311,14 +462,19 @@ function loadNeedleGraph(id, from, until) {
 
 		dataType : "json",
 		success : function(data) {
-			var newData = [ {
-				name : data.name,
-				data : data.data,
-				color : 'steelblue'
-			} ];
+			if (data != null) {
+				var newData = [ {
+					name : data.name,
+					data : data.data,
+					color : 'steelblue'
+				} ];
 
-			updateGraph(needleGraph, needleGraphData, newData, "#legend0",
-					'preview0')
+				updateGraph(needleGraph, needleGraphData, newData, "#legend0",
+						'preview0')
+			} else {
+				alert("No data available in the selected interval!")
+			}
+			$("body").toggleClass("wait");
 
 		}
 	});
@@ -411,8 +567,8 @@ function setDistanceFunc(aggr_int_id) {
 
 			$.each(data, function(i, data) {
 
-				var div_data = "<option value=" + data.distances_id + ">"
-						+ data.distanceFunctionName + "</option>";
+				var div_data = "<option value=" + data.id + ">"
+						+ data.description + "</option>";
 				$(div_data).appendTo('#dist_func');
 			});
 
@@ -524,8 +680,8 @@ function startSAX() {
 						haystack_from, haystack_until, data.sax_index,
 						data.aggr_int.seconds, data.aggr_int.id,
 						data.shift_by.description, data.missing_values,
-						data.no_best_hits, data.dist_func.distances_id,
-						data.dist_func.distanceFunctionName);
+						data.no_best_hits, data.dist_func.id,
+						data.dist_func.description);
 			}
 		});
 
@@ -579,9 +735,9 @@ function startSax(needle_id, needle_description, needle_from, needle_until,
 							data.needle.from.millis));
 					var needle_until = format_date(new Date(
 							data.needle.until.millis));
-					var needle_from_seconds = data.needle.from.millis / 1000
-					var needle_until_seconds = data.needle.until.millis / 1000
-
+					var needle_from_seconds = data.needle.from.millis / 1000;
+					var needle_until_seconds = data.needle.until.millis / 1000;
+					var distance_func = data.properties.dist_func.description;
 					// alert(aggr_int + " " + shiftby + " " + missingvalues + "
 					// "
 					// + needle_id + " " + needle_description + " "
@@ -601,6 +757,7 @@ function startSax(needle_id, needle_description, needle_from, needle_until,
 						n_until : needle_until,
 						n_from_seconds : needle_from_seconds,
 						n_until_seconds : needle_until_seconds,
+						distance_func : distance_func,
 						missing_values : (missingvalues * 100 + "%"),
 						nested : []
 					}
@@ -619,6 +776,8 @@ function startSax(needle_id, needle_description, needle_from, needle_until,
 										resultData.nested
 												.push({
 													state : state,
+													distance_formatted : (hay_sub.distance)
+															.toFixed(4),
 													distance : hay_sub.distance,
 													h_id : hay_sub.haystack_subsequence.id,
 													h_name : hay_sub.haystack_subsequence.description,
@@ -642,4 +801,19 @@ function startSax(needle_id, needle_description, needle_from, needle_until,
 				}
 
 			});
+
+}
+
+$.fn.disable = function() {
+	return this.each(function() {
+		if (typeof this.disabled != "undefined")
+			this.disabled = true;
+	});
+}
+
+$.fn.enable = function() {
+	return this.each(function() {
+		if (typeof this.disabled != "undefined")
+			this.disabled = false;
+	});
 }

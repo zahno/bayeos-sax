@@ -7,36 +7,46 @@ package de.unibayreuth.bayceer.bayeos.dto.sax;
  */
 public class SaxDistanceFunction {
 
-	private String distanceFunctionName;
+	private String description;
 	// the id from the bayeos database table sax.sax_distances
-	private int distances_id;
+	private int id;
 
-	public SaxDistanceFunction(int distances_id, String distanceFunctionName) {
-		this.distances_id = distances_id;
-		this.distanceFunctionName = distanceFunctionName;
+	public SaxDistanceFunction(int id, String description) {
+		this.id = id;
+		this.description = description;
 	}
 
-	public int getDistances_id() {
-		return distances_id;
+
+
+	public String getDescription() {
+		return description;
 	}
 
-	public void setDistances_id(int distances_id) {
-		this.distances_id = distances_id;
+
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
-	public String getDistanceFunctionName() {
-		return distanceFunctionName;
+
+
+	public int getId() {
+		return id;
 	}
 
-	public void setDistanceFunctionName(String distanceFunctionName) {
-		this.distanceFunctionName = distanceFunctionName;
+
+
+	public void setId(int id) {
+		this.id = id;
 	}
+
+
 
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof SaxDistanceFunction) {
-			return this.distances_id == ((SaxDistanceFunction) obj).distances_id
-					&& this.distanceFunctionName.equals(((SaxDistanceFunction) obj).distanceFunctionName);
+			return this.id == ((SaxDistanceFunction) obj).id
+					&& this.description.equals(((SaxDistanceFunction) obj).description);
 		}
 		return false;
 	}

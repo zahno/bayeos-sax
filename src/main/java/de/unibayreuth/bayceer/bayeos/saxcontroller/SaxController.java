@@ -430,7 +430,7 @@ public class SaxController {
 		String needle_description, shiftby_string, aggr_int_string, distanceTable_name;
 		String[] haystack_descriptions;
 		DateTime needle_from, needle_until, haystack_min_from, haystack_max_until;
-		int needle_id, sax_index, no_best_hits, distanceTable_id, aggr_int_id, shift_by;
+		int needle_id, sax_index, no_best_hits, distanceTable_id, aggr_int_id, shift_by, compression_factor;
 		int[] haystack_ids;
 		double missing_values;
 
@@ -471,7 +471,12 @@ public class SaxController {
 		// get the aggregation interval depending on aggregation interval
 		int aggr_int_seconds = get_agg_int_in_seconds(aggr_int_id);
 
-		// get from and until of available sax series
+		// get actually available min and max Timestamps for needle
+		Tuple<DateTime, DateTime> timestamps = getAvailableFromUntil(needle_id, needle_from, needle_until, sax_index);
+		needle_from = timestamps.x;
+		needle_until = timestamps.y;
+
+		// get from and until of available haystack sax series
 		Tuple<DateTime[], DateTime[]> haystacks_from_until = getHaystacks_FromUntil(haystack_ids, sax_index,
 				haystack_min_from, haystack_max_until);
 		DateTime[] haystack_from = haystacks_from_until.x, haystack_until = haystacks_from_until.y;
@@ -489,15 +494,35 @@ public class SaxController {
 		}
 
 		shift_by = get_no_shiftby(aggr_int_id, shiftby_string);
+		compression_factor = get_compression_factor(needle_id, sax_index);
 
 		SaxResult sax = Sax.sax(needle_id, needle_description, needle_from, needle_until, haystack_ids,
 				haystack_descriptions, haystack_from, haystack_until, sax_index, aggr_int_seconds, aggr_int_string,
 				shift_by, shiftby_string, missing_values, no_best_hits, sax_distances, distanceTable_id,
-				distanceTable_name);
+				distanceTable_name, compression_factor);
 
 		log.info(sax.toString());
 
 		return sax;
+	}
+
+	private int get_compression_factor(int needle_id, int sax_index) {
+		int compression_factor = 0;
+
+		try (Connection c = ServletInitializer.getConnection();
+				Statement stmt = c.createStatement();
+				ResultSet rs = stmt
+						.executeQuery("SELECT compression_factor FROM sax.sax_measured_data WHERE messung_id = "
+								+ needle_id + " and saxtable_id = " + sax_index);) {
+			while (rs.next()) {
+				compression_factor = rs.getInt(1);
+			}
+
+		} catch (SQLException e) {
+			log.error(e.getMessage());
+			e.printStackTrace();
+		}
+		return compression_factor;
 	}
 
 	/**
@@ -519,35 +544,43 @@ public class SaxController {
 			DateTime haystack_min_from, DateTime haystack_max_until) {
 		DateTime[] haystack_from = new DateTime[haystack_ids.length],
 				haystack_until = new DateTime[haystack_ids.length];
-		DateTime server_from, server_until;
 
 		for (int i = 0; i < haystack_ids.length; i++) {
-			try (Connection con = ServletInitializer.getConnection();
+			Tuple<DateTime, DateTime> timestamps = getAvailableFromUntil(haystack_ids[i], haystack_min_from,
+					haystack_max_until, sax_index);
+			haystack_from[i] = timestamps.x;
+			haystack_until[i] = timestamps.y;
 
-					PreparedStatement st = con
-							.prepareStatement("select von, bis from sax.sax_measured_data_values WHERE reihe_id = "
-									+ haystack_ids[i] + " AND saxtable_id = " + sax_index);
-					ResultSet result = st.executeQuery();) {
-				while (result.next()) {
-					server_from = new DateTime(new Date(result.getTimestamp(1).getTime()));
-					server_until = new DateTime(new Date(result.getTimestamp(2).getTime()));
-					// outside available interval
-					if (server_until.isBefore(haystack_min_from) || server_from.isAfter(haystack_max_until)) {
-						haystack_from[i] = null;
-						haystack_until[i] = null;
-						continue;
-					}
-					haystack_from[i] = haystack_min_from.isBefore(server_from.getMillis()) ? server_from
-							: haystack_min_from;
-					haystack_until[i] = haystack_max_until.isAfter(server_until.getMillis()) ? server_until
-							: haystack_max_until;
-				}
-			} catch (SQLException e) {
-				log.error(e.getMessage());
-				throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-			}
 		}
 		return new Tuple<DateTime[], DateTime[]>(haystack_from, haystack_until);
+	}
+
+	private static Tuple<DateTime, DateTime> getAvailableFromUntil(int id, DateTime date_min, DateTime date_max,
+			int sax_index) {
+		DateTime server_from, server_until;
+
+		try (Connection con = ServletInitializer.getConnection();
+
+				PreparedStatement st = con
+						.prepareStatement("select von, bis from sax.sax_measured_data_values WHERE reihe_id = " + id
+								+ " AND saxtable_id = " + sax_index);
+				ResultSet result = st.executeQuery();) {
+			while (result.next()) {
+				server_from = new DateTime(new Date(result.getTimestamp(1).getTime()));
+				server_until = new DateTime(new Date(result.getTimestamp(2).getTime()));
+				// outside available interval
+				if (server_until.isBefore(date_min) || server_from.isAfter(date_max)) {
+					return new Tuple<DateTime, DateTime>(null, null);
+				}
+				return new Tuple<DateTime, DateTime>(
+						date_min.isBefore(server_from.getMillis()) ? server_from : date_min,
+						date_max.isAfter(server_until.getMillis()) ? server_until : date_max);
+			}
+		} catch (SQLException e) {
+			log.error(e.getMessage());
+			throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+		}
+		return new Tuple<DateTime, DateTime>(null, null);
 	}
 
 	/**
@@ -830,10 +863,10 @@ public class SaxController {
 		}
 
 		List<SaxDistanceFunction> available_distancefunc = available_distance_func_id.get(aggr_int_id);
-		if (available_distancefunc.contains(new SaxDistanceFunction(2, "MaxDist"))) {
+		if (available_distancefunc.contains(new SaxDistanceFunction(SaxDistanceFunction.MAXDIST))) {
 			distanceTable_id = 2;
 			distanceTable_name = "MaxDist";
-		} else {
+		} else if (available_distancefunc.contains(new SaxDistanceFunction(SaxDistanceFunction.MINDIST))) {
 			distanceTable_id = 1;
 			distanceTable_name = "MinDist";
 		}

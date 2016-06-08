@@ -18,6 +18,7 @@ public class SaxSeries {
 	private String description;
 	private DateTime from, until;
 	private String sax;
+	private int compression_factor;
 	// timestamp 
 	private long from_seconds, until_seconds;
 
@@ -37,12 +38,13 @@ public class SaxSeries {
 		this.until_seconds = until_seconds;
 	}
 
-	public SaxSeries(int id, String description, DateTime from, DateTime until, String sax) {
+	public SaxSeries(int id, String description, int compression_factor, DateTime from, DateTime until, String sax) {
 		this.id = id;
 		this.from = from;
 		this.until = until;
 		this.sax = sax;
 		this.setDescription(description);
+		this.compression_factor = compression_factor;
 	}
 
 	public SaxSeries(int id, String description, long from, long until) {
@@ -96,6 +98,14 @@ public class SaxSeries {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public int getCompression_factor() {
+		return compression_factor;
+	}
+
+	public void setCompression_factor(int compression_factor) {
+		this.compression_factor = compression_factor;
 	}
 
 }

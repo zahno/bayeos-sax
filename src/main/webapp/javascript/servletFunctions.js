@@ -618,10 +618,11 @@ function startSAX() {
 		var aggr_int_id = $('#aggr_int').find("option:selected").val();
 		var aggr_int = $('#aggr_int').find("option:selected").text();
 		var shiftby = $('#shiftby').find("option:selected").text();
-		var distanceTable_id = $('#dist_func').val();
-		var distanceTable_name = $('#dist_func').text();
+		var distanceTable_id = $('#dist_func').find("option:selected").val();
+		var distanceTable_name = $('#dist_func').find("option:selected").text();
 		var missing_values = $('#missingValues').find("option:selected").val();
 		var no_best_hits = $('#no_best_hits').find("option:selected").val();
+
 
 		$.ajax({
 			type : "GET",

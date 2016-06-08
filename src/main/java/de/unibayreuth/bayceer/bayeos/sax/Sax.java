@@ -85,6 +85,10 @@ public class Sax {
 	 * @param distanceTable_name
 	 *            A description of the distance function (eg. "MaxDist" or
 	 *            "MinDist")
+	 * @param compression_factor
+	 *            The factor the data is compressed by, eg. original data in 10
+	 *            min interval, aggregation interval is 60 minutes ->
+	 *            compression factor is 6
 	 * @return A SaxResult object containing the best x hits along with the
 	 *         euclidean distance to each subsequence
 	 */
@@ -93,11 +97,13 @@ public class Sax {
 			int sax_index, int aggr_int_seconds, String aggr_int_string, int shift_by_indices,
 			String shiftby_description, double missing_values, int no_best_hits,
 			HashMap<MirroredTuple<Character, Character>, Double> sax_distances, int distanceTable_id,
-			String distanceTable_name) {
+			String distanceTable_name, int compression_factor) {
 
 		log.info("Starting SAX similarity search. Shift window by " + shift_by_indices + " indizes \n\tNeedle: [ID: "
 				+ needle_id + ", from " + needle_from + " until " + needle_until + "]\n\tHaystack: [ID: " + haystack_ids
 				+ ", from " + haystack_from + " until " + haystack_until + "]");
+
+		SaxDistanceFunction distanceFunction = new SaxDistanceFunction(distanceTable_id, distanceTable_name);
 
 		ResultCollection results = new ResultCollection(no_best_hits);
 
@@ -105,7 +111,8 @@ public class Sax {
 		String saxstring_needle = get_sax_subsequence(needle_id, needle_from, needle_until, sax_index);
 
 		// Create the needle object
-		SaxSeries needle = new SaxSeries(needle_id, needle_description, needle_from, needle_until, saxstring_needle);
+		SaxSeries needle = new SaxSeries(needle_id, needle_description, compression_factor, needle_from, needle_until,
+				saxstring_needle);
 
 		String saxstring_haystack, sub_saxstring_haystack;
 		int maxindex, currentindex, noMinValidValues;
@@ -145,12 +152,14 @@ public class Sax {
 				// calculate the euclidean distance using the two strings and
 				// the lookup table (is null if there are too many missing
 				// values)
-				distance = getDistance(saxstring_needle, sub_saxstring_haystack, sax_distances, noMinValidValues);
+				distance = getDistance(saxstring_needle, sub_saxstring_haystack, sax_distances, compression_factor,
+						noMinValidValues, distanceFunction);
 
 				if (distance != null) {
 					// Create a SaxSeries object and insert (if possible) into
 					// the best hits result
 					SaxSeries sub_haystack = new SaxSeries(haystack_ids[i], haystack_descriptions[i],
+							compression_factor,
 							haystack_from[i].withPeriodAdded(Period.seconds(aggr_int_seconds), currentindex),
 							haystack_from[i].withPeriodAdded(Period.seconds(aggr_int_seconds),
 									currentindex + sub_saxstring_haystack.length()),
@@ -171,9 +180,8 @@ public class Sax {
 
 		SaxResult saxResult = new SaxResult(needle, results.getResults(),
 				new SaxProperties(new SaxAggregationInterval(aggr_int_seconds),
-						new SaxShiftBy(shift_by_indices, shiftby_description),
-						new SaxDistanceFunction(distanceTable_id, distanceTable_name), sax_index, missing_values,
-						no_best_hits));
+						new SaxShiftBy(shift_by_indices, shiftby_description), distanceFunction, sax_index,
+						missing_values, no_best_hits));
 
 		return saxResult;
 
@@ -187,10 +195,12 @@ public class Sax {
 	 * @param sub_saxstring_haystack
 	 * @param sax_distances
 	 * @param noMinValidValues
+	 * @param distancefuntion
 	 * @return
 	 */
 	private static Double getDistance(String saxstring_needle, String sub_saxstring_haystack,
-			HashMap<MirroredTuple<Character, Character>, Double> sax_distances, int noMinValidValues) {
+			HashMap<MirroredTuple<Character, Character>, Double> sax_distances, int compression_factor,
+			int noMinValidValues, SaxDistanceFunction distancefuntion) {
 		Double squaredsum = null;
 		int noValidValues = saxstring_needle.length();
 
@@ -212,6 +222,15 @@ public class Sax {
 		}
 
 		return (squaredsum != null) ? Math.sqrt(squaredsum / noValidValues) : null;
+
+		// if (distancefuntion.getType() == SaxDistanceFunction.MINDIST) {
+		// return (squaredsum != null) ? Math.sqrt(squaredsum) *
+		// Math.sqrt(compression_factor) : null;
+		// } else if (distancefuntion.getType() == SaxDistanceFunction.MAXDIST)
+		// {
+		// return (squaredsum != null) ? Math.sqrt(squaredsum) : null;
+		// } else
+		// return null;
 
 	}
 

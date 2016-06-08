@@ -15,11 +15,11 @@ public class SaxSeries {
 
 	// from the bayeos database table "messungen", columns "id" and "bezeichnung
 	private int id;
-	private String description;
+	private String description, type;
 	private DateTime from, until;
 	private String sax;
 	private int compression_factor;
-	// timestamp 
+	// timestamp
 	private long from_seconds, until_seconds;
 
 	public long getFrom_seconds() {
@@ -38,7 +38,8 @@ public class SaxSeries {
 		this.until_seconds = until_seconds;
 	}
 
-	public SaxSeries(int id, String description, int compression_factor, DateTime from, DateTime until, String sax) {
+	public SaxSeries(int id, String description, int compression_factor, DateTime from, DateTime until,
+			String sax) {
 		this.id = id;
 		this.from = from;
 		this.until = until;
@@ -47,11 +48,12 @@ public class SaxSeries {
 		this.compression_factor = compression_factor;
 	}
 
-	public SaxSeries(int id, String description, long from, long until) {
+	public SaxSeries(int id, String description, String type, long from, long until) {
 		this.id = id;
 		this.description = description;
 		this.setFrom_seconds(from);
 		this.setUntil_seconds(until);
+		this.type = type;
 
 	}
 
@@ -106,6 +108,14 @@ public class SaxSeries {
 
 	public void setCompression_factor(int compression_factor) {
 		this.compression_factor = compression_factor;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
 	}
 
 }

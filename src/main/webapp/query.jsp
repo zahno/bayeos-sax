@@ -99,6 +99,7 @@
 									<tr>
 										<th data-field="state" data-radio="true"></th>
 										<th data-field="name" data-sortable="true">Name</th>
+										<th data-field="type" data-sortable="true">Type</th>
 										<th data-field="id" data-sortable="true">ID</th>
 										<th data-field="from" data-sortable="true">From</th>
 										<th data-field="until" data-sortable="true">Until</th>
@@ -229,6 +230,7 @@
 								<tr>
 									<th data-field="state" data-checkbox="true"></th>
 									<th data-field="name" data-sortable="true">Name</th>
+									<th data-field="type" data-sortable="true">Type</th>
 									<th data-field="id" data-sortable="true">ID</th>
 									<th data-field="from" data-sortable="true">From</th>
 									<th data-field="until" data-sortable="true">Until</th>
@@ -599,10 +601,10 @@
 	<div id="footer">
 
 		<p class="text-muted credit">
-			© 2014-2016 <a href="http://www.uni-bayreuth.de/">University of
-				Bayreuth,</a> <a href="http://www.bayceer.uni-bayreuth.de/">BayCEER</a>
-			Release 1.0.20 - Fabulous icons from <a href="http://glyphicons.com">Glyphicons
-				Free</a>, licensed under <a
+			© 2016 Christiane Göhring, <a href="http://www.uni-bayreuth.de/">University
+				of Bayreuth,</a> <a href="http://www.bayceer.uni-bayreuth.de/">BayCEER</a>
+			Release ${project.version} - Fabulous icons from <a
+				href="http://glyphicons.com">Glyphicons Free</a>, licensed under <a
 				href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>
 		</p>
 	</div>

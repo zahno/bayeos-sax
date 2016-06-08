@@ -92,7 +92,7 @@ public class Sax {
 	 * @return A SaxResult object containing the best x hits along with the
 	 *         euclidean distance to each subsequence
 	 */
-	public static SaxResult sax(int needle_id, String needle_description, DateTime needle_from, DateTime needle_until,
+	public static SaxResult similaritySearch(int needle_id, String needle_description, DateTime needle_from, DateTime needle_until,
 			int[] haystack_ids, String[] haystack_descriptions, DateTime[] haystack_from, DateTime[] haystack_until,
 			int sax_index, int aggr_int_seconds, String aggr_int_string, int shift_by_indices,
 			String shiftby_description, double missing_values, int no_best_hits,

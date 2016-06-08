@@ -83,13 +83,17 @@ public class SaxController {
 						"SELECT bezeichnung FROM messungen WHERE id = " + resultSet_messreihenId.getInt(1));
 						ResultSet resultSet_from_until = con.createStatement().executeQuery(
 								("select min(von), max(bis) from sax.sax_measured_data_values WHERE sax_measured_data_values.reihe_id = "
+										+ resultSet_messreihenId.getInt(1)));
+						ResultSet resultSet_measuredvalue_type = con.createStatement().executeQuery(
+								("select distinct type from sax.sax_measured_data WHERE sax_measured_data.messung_id = "
 										+ resultSet_messreihenId.getInt(1)))) {
-					log.info("SELECT bezeichnung FROM messungen WHERE id = " + resultSet_messreihenId.getInt(1));
+
 					resultSet_messreihenBezeichnung.next();
 					resultSet_from_until.next();
-
+					resultSet_measuredvalue_type.next();
+					
 					ret.add(new SaxSeries(resultSet_messreihenId.getInt(1),
-							resultSet_messreihenBezeichnung.getString(1),
+							resultSet_messreihenBezeichnung.getString(1), resultSet_measuredvalue_type.getString(1),
 							(resultSet_from_until.getTimestamp(1).getTime() / 1000),
 							(resultSet_from_until.getTimestamp(2).getTime() / 1000)));
 
@@ -423,9 +427,9 @@ public class SaxController {
 	 * @return The results of that search in the form of a SaxResult object.
 	 */
 	@GET
-	@Path("/SAX")
+	@Path("/SimilaritySearch")
 	@Produces("application/json")
-	public SaxResult startSax() {
+	public SaxResult startSimilaritySearch() {
 
 		String needle_description, shiftby_string, aggr_int_string, distanceTable_name;
 		String[] haystack_descriptions;
@@ -496,7 +500,7 @@ public class SaxController {
 		shift_by = get_no_shiftby(aggr_int_id, shiftby_string);
 		compression_factor = get_compression_factor(needle_id, sax_index);
 
-		SaxResult sax = Sax.sax(needle_id, needle_description, needle_from, needle_until, haystack_ids,
+		SaxResult sax = Sax.similaritySearch(needle_id, needle_description, needle_from, needle_until, haystack_ids,
 				haystack_descriptions, haystack_from, haystack_until, sax_index, aggr_int_seconds, aggr_int_string,
 				shift_by, shiftby_string, missing_values, no_best_hits, sax_distances, distanceTable_id,
 				distanceTable_name, compression_factor);

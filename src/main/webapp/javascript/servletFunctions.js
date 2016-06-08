@@ -152,6 +152,7 @@ $(document).ready(
 						var mydata = {
 							name : data.description,
 							id : data.id,
+							type: data.type,
 							from : format_date(new Date(
 									data.from_seconds * 1000)),
 							until : format_date(new Date(
@@ -163,6 +164,7 @@ $(document).ready(
 						var mydata2 = {
 							name : data.description,
 							id : data.id,
+							type: data.type,
 							from : format_date(new Date(
 									data.from_seconds * 1000)),
 							until : format_date(new Date(
@@ -632,7 +634,7 @@ function startSAX() {
 			success : function(data) {
 				sax_index = data;
 
-				startSax(needle_id, needle_description, needle_from,
+				startSimilaritySearch(needle_id, needle_description, needle_from,
 						needle_until, haystack_ids, haystack_descriptions,
 						haystack_from, haystack_until, sax_index, aggr_int,
 						aggr_int_id, shiftby, missing_values, no_best_hits,
@@ -676,7 +678,7 @@ function startSAX() {
 			dataType : "json",
 			success : function(data) {
 
-				startSax(needle_id, needle_description, needle_from,
+				startSimilaritySearch(needle_id, needle_description, needle_from,
 						needle_until, haystack_ids, haystack_descriptions,
 						haystack_from, haystack_until, data.sax_index,
 						data.aggr_int.seconds, data.aggr_int.id,
@@ -695,14 +697,14 @@ function startSAX() {
 
 }
 
-function startSax(needle_id, needle_description, needle_from, needle_until,
+function startSimilaritySearch(needle_id, needle_description, needle_from, needle_until,
 		haystack_ids, haystack_descriptions, haystack_from, haystack_until,
 		sax_index, aggr_int, aggr_int_id, shiftby, missing_values,
 		no_best_hits, distanceTable_id, distanceTable_name) {
 	$
 			.ajax({
 				type : "GET",
-				url : "/bayeos-sax/rest/app/SAX",
+				url : "/bayeos-sax/rest/app/SimilaritySearch",
 				data : {
 					needle_id : needle_id,
 					needle_description : needle_description,

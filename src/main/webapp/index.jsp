@@ -2,6 +2,11 @@
 <body>
 
 	<h3>${project.name}${project.version}</h3>
+	<br>
+	<br> 0.0.6-SNAPSHOT:
+	<br> Added compression factor; Bugfix for wrong distance function
+	name and wrong needle timestamp
+	<br>
 	<br> 0.0.6-SNAPSHOT:
 	<br> Implemented back, forward and interval buttons
 	<br>

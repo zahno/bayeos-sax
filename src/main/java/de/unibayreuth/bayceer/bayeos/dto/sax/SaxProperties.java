@@ -76,4 +76,10 @@ public class SaxProperties {
 		this.dist_func = dist_func;
 	}
 
+	@Override
+	public String toString() {
+		return "Properties: [(" + sax_index + "), (" + aggr_int + "), (" + shift_by + "), (" + dist_func + "), ("
+				+ missing_values + "), (" + missing_values + ")]";
+	}
+
 }

@@ -3,6 +3,12 @@
 
 	<h3>${project.name}${project.version}</h3>
 	<br>
+	<br> 0.0.8-SNAPSHOT:
+	<br> Implemented automatic adjustment of time zones
+	<br>
+	<br> 0.0.7-SNAPSHOT:
+	<br> Added measured variable in haystack and needle table
+	<br>
 	<br> 0.0.6-SNAPSHOT:
 	<br> Added compression factor; Bugfix for wrong distance function
 	name and wrong needle timestamp

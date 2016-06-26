@@ -38,8 +38,7 @@ public class SaxSeries {
 		this.until_seconds = until_seconds;
 	}
 
-	public SaxSeries(int id, String description, int compression_factor, DateTime from, DateTime until,
-			String sax) {
+	public SaxSeries(int id, String description, int compression_factor, DateTime from, DateTime until, String sax) {
 		this.id = id;
 		this.from = from;
 		this.until = until;
@@ -91,7 +90,7 @@ public class SaxSeries {
 
 	@Override
 	public String toString() {
-		return "ID " + id + " from " + from + " until " + until;
+		return "SaxSeries: ID = " + id + ", from " + from + ", until " + until;
 	}
 
 	public String getDescription() {

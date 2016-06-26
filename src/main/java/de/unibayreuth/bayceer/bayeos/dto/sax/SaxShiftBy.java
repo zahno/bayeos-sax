@@ -11,8 +11,10 @@ public class SaxShiftBy implements Comparable<SaxShiftBy> {
 
 	// eg "6 hours"
 	private String description;
-	// number of indices that corresponds to; time interval in seconds (eg. 14.400 seconds for 6 hours)
-	private int indices, seconds;
+	// number of indices that corresponds to; time interval in seconds (eg.
+	// 14.400 seconds for 6 hours)
+	private int indices;
+	private int seconds;
 
 	public SaxShiftBy(int shiftby_indices, String description) {
 		this.indices = shiftby_indices;
@@ -40,6 +42,7 @@ public class SaxShiftBy implements Comparable<SaxShiftBy> {
 	public SaxShiftBy(String description) {
 		if (description == null)
 			return;
+		this.indices = 0;
 
 		this.description = description;
 		switch (description) {
@@ -99,4 +102,12 @@ public class SaxShiftBy implements Comparable<SaxShiftBy> {
 		return this.seconds - o.getSeconds();
 	}
 
+	@Override
+	public String toString() {
+		if (indices == 0) {
+			return "Shift By: description = " + description + ", seconds = " + seconds;
+		}
+		return "Shift By: description = " + description + ", seconds = " + seconds + ", equals indices = " + indices;
+
+	}
 }

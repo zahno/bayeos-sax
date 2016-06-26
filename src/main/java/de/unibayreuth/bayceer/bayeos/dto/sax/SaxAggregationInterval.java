@@ -2,6 +2,7 @@ package de.unibayreuth.bayceer.bayeos.dto.sax;
 
 /**
  * Class that represents an Aggregation Interval object.
+ * 
  * @author christiane-goehring
  *
  */
@@ -18,21 +19,29 @@ public class SaxAggregationInterval {
 		this.setId(aggr_int_id);
 		switch (aggr_int_description) {
 		case "10 minutes":
-			setSeconds(600); break;
+			setSeconds(600);
+			break;
 		case "30 minutes":
-			setSeconds(3 * 600); break;
+			setSeconds(3 * 600);
+			break;
 		case "1 hour":
-			setSeconds(6 * 600); break;
+			setSeconds(6 * 600);
+			break;
 		case "2 hours":
-			setSeconds(12 * 600); break;
+			setSeconds(12 * 600);
+			break;
 		case "4 hours":
-			setSeconds(24 * 600); break;
+			setSeconds(24 * 600);
+			break;
 		case "6 hours":
-			setSeconds(36 * 600); break;
+			setSeconds(36 * 600);
+			break;
 		case "12 hours":
-			setSeconds(72 * 600); break;
+			setSeconds(72 * 600);
+			break;
 		case "1 day":
-			setSeconds(144 * 600); break;
+			setSeconds(144 * 600);
+			break;
 		}
 	}
 
@@ -40,44 +49,60 @@ public class SaxAggregationInterval {
 		this.setSeconds(seconds);
 		switch (seconds) {
 		case 600:
-			this.setDescription("10 minutes"); break;
+			this.setDescription("10 minutes");
+			break;
 		case 3 * 600:
-			this.setDescription("30 minutes"); break;
+			this.setDescription("30 minutes");
+			break;
 		case 6 * 600:
-			this.setDescription("1 hour"); break;
+			this.setDescription("1 hour");
+			break;
 		case 12 * 600:
-			this.setDescription("2 hours"); break;
+			this.setDescription("2 hours");
+			break;
 		case 24 * 600:
-			this.setDescription("4 hours"); break;
+			this.setDescription("4 hours");
+			break;
 		case 36 * 600:
-			this.setDescription("6 hours"); break;
+			this.setDescription("6 hours");
+			break;
 		case 72 * 600:
-			this.setDescription("12 hours"); break;
+			this.setDescription("12 hours");
+			break;
 		case 144 * 600:
-			this.setDescription("24 hours"); break;
+			this.setDescription("24 hours");
+			break;
 		}
 	}
-	
-	public SaxAggregationInterval(int id, int seconds){
+
+	public SaxAggregationInterval(int id, int seconds) {
 		this.setId(id);
 		this.setSeconds(seconds);
 		switch (seconds) {
 		case 600:
-			this.setDescription("10 minutes"); break;
+			this.setDescription("10 minutes");
+			break;
 		case 3 * 600:
-			this.setDescription("30 minutes"); break;
+			this.setDescription("30 minutes");
+			break;
 		case 6 * 600:
-			this.setDescription("1 hour"); break;
+			this.setDescription("1 hour");
+			break;
 		case 12 * 600:
-			this.setDescription("2 hours"); break;
+			this.setDescription("2 hours");
+			break;
 		case 24 * 600:
-			this.setDescription("4 hours"); break;
+			this.setDescription("4 hours");
+			break;
 		case 36 * 600:
-			this.setDescription("6 hours"); break;
+			this.setDescription("6 hours");
+			break;
 		case 72 * 600:
-			this.setDescription("12 hours"); break;
+			this.setDescription("12 hours");
+			break;
 		case 144 * 600:
-			this.setDescription("24 hours"); break;
+			this.setDescription("24 hours");
+			break;
 		}
 	}
 
@@ -105,6 +130,9 @@ public class SaxAggregationInterval {
 		this.seconds = seconds;
 	}
 
-
+	@Override
+	public String toString() {
+		return "AggregationInterval: description = " + description + ", seconds = " + seconds + ", id = " + id;
+	}
 
 }

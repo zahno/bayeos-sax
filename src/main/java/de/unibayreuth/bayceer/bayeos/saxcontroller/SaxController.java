@@ -91,7 +91,7 @@ public class SaxController {
 					resultSet_messreihenBezeichnung.next();
 					resultSet_from_until.next();
 					resultSet_measuredvalue_type.next();
-					
+
 					ret.add(new SaxSeries(resultSet_messreihenId.getInt(1),
 							resultSet_messreihenBezeichnung.getString(1), resultSet_measuredvalue_type.getString(1),
 							(resultSet_from_until.getTimestamp(1).getTime() / 1000),
@@ -186,6 +186,7 @@ public class SaxController {
 							+ " WHERE id = " + id + " AND von >= to_timestamp(" + from + ") AND von <= to_timestamp("
 							+ until + ")')");
 					ResultSet result = st.executeQuery();) {
+				log.debug(st.toString());
 
 				result.next();
 
@@ -197,6 +198,8 @@ public class SaxController {
 							.prepareStatement("select count(*) from " + tables[i] + " WHERE id = " + id
 									+ " AND von >= to_timestamp(" + from + ") AND von <= to_timestamp(" + until + ")");
 							ResultSet result2 = st2.executeQuery();) {
+						log.debug(st2.toString());
+
 						result2.next();
 						rowCount = result2.getInt(1);
 						if (rowCount == 0) {
@@ -271,6 +274,9 @@ public class SaxController {
 				ResultSet haystack_description = con.createStatement()
 						.executeQuery("SELECT bezeichnung FROM messungen WHERE id = " + haystack_id)) {
 
+			log.debug(needle_val_st);
+			log.debug(haystack__val_st.toString());
+
 			// get description
 			needle_description.next();
 			haystack_description.next();
@@ -328,6 +334,8 @@ public class SaxController {
 						"select id, name FROM sax.sax_distances WHERE id_sax_limits = " + result.getInt(1));
 						ResultSet result2 = st2.executeQuery()) {
 					result2.next();
+					log.debug(st2.toString());
+
 
 					SaxDistanceFunction id = new SaxDistanceFunction(result2.getInt(1), result2.getString(2));
 					distanceFunctions.add(id);
@@ -369,6 +377,8 @@ public class SaxController {
 				try (PreparedStatement st2 = con.prepareStatement(
 						"select description from sax.aggregation_interval where id = " + result.getInt(1));
 						ResultSet result2 = st2.executeQuery()) {
+					log.debug(st2.toString());
+
 					result2.next();
 					SaxAggregationInterval id = new SaxAggregationInterval(result.getInt(1), result2.getString(1));
 					aggr_intervals.add(id);
@@ -410,7 +420,8 @@ public class SaxController {
 			try (PreparedStatement st2 = con.prepareStatement("select id from sax.sax_index where id_sax_limits = "
 					+ result.getInt(1) + " and id_aggr_int = " + aggr_int_id); ResultSet result2 = st2.executeQuery()) {
 				result2.next();
-				log.info("sax index is " + result2.getInt(1));
+				log.debug(st2.toString());
+
 				return result2.getInt(1);
 			}
 
@@ -569,6 +580,8 @@ public class SaxController {
 						.prepareStatement("select von, bis from sax.sax_measured_data_values WHERE reihe_id = " + id
 								+ " AND saxtable_id = " + sax_index);
 				ResultSet result = st.executeQuery();) {
+			log.debug(st.toString());
+
 			while (result.next()) {
 				server_from = new DateTime(new Date(result.getTimestamp(1).getTime()));
 				server_until = new DateTime(new Date(result.getTimestamp(2).getTime()));
@@ -576,9 +589,13 @@ public class SaxController {
 				if (server_until.isBefore(date_min) || server_from.isAfter(date_max)) {
 					return new Tuple<DateTime, DateTime>(null, null);
 				}
+				while (date_min.isBefore(server_from.getMillis())) {
+					date_min = date_min.plusDays(1);
+				}
+
 				return new Tuple<DateTime, DateTime>(
-						date_min.isBefore(server_from.getMillis()) ? server_from : date_min,
-						date_max.isAfter(server_until.getMillis()) ? server_until : date_max);
+
+						date_min, date_max.isAfter(server_until.getMillis()) ? server_until : date_max);
 			}
 		} catch (SQLException e) {
 			log.error(e.getMessage());
@@ -853,7 +870,7 @@ public class SaxController {
 		}
 		maxNoOfOperations = maxNoOfOperations / aggr_int_seconds;
 
-		log.info("No Of Operations:" + maxNoOfOperations);
+		log.info("No of Operations: " + maxNoOfOperations);
 
 		for (int j = 0; j < available_shiftby.size(); j++) {
 			log.info("Shiftby " + available_shiftby.get(j).getDescription() + " :"

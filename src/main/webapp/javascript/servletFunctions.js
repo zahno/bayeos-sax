@@ -152,7 +152,7 @@ $(document).ready(
 						var mydata = {
 							name : data.description,
 							id : data.id,
-							type: data.type,
+							type : data.type,
 							from : format_date(new Date(
 									data.from_seconds * 1000)),
 							until : format_date(new Date(
@@ -164,7 +164,7 @@ $(document).ready(
 						var mydata2 = {
 							name : data.description,
 							id : data.id,
-							type: data.type,
+							type : data.type,
 							from : format_date(new Date(
 									data.from_seconds * 1000)),
 							until : format_date(new Date(
@@ -582,9 +582,6 @@ function setDistanceFunc(aggr_int_id) {
 var queryId = 0;
 
 function startSAX() {
-	$("body").toggleClass("wait");
-	$('.nav-tabs a[href="#results"]').tab('show');
-
 	var needle_id = $('#needleTable').bootstrapTable('getSelections')[0].id;
 	var needle_description = $('#needleTable').bootstrapTable('getSelections')[0].name;
 
@@ -607,8 +604,39 @@ function startSAX() {
 		haystack_descriptions.push(haystackSelections[i].name);
 	}
 
-	var haystack_from = moment($('#haystack_from').val()).toDate().getTime();
-	var haystack_until = moment($('#haystack_until').val()).toDate().getTime();
+	// alert(moment($('#haystack_from').val()));
+	// alert(moment($('#haystack_from').val()).toDate().getTime());
+	// alert((moment($('#haystack_from').val()).toDate()).getTimezoneOffset());
+	// alert(moment($('#from').val()));
+	// alert((moment($('#from').val()).toDate()).getTimezoneOffset());
+
+	var offset = (moment($('#haystack_from').val()).toDate())
+			.getTimezoneOffset()
+			- (moment($('#from').val()).toDate()).getTimezoneOffset();
+	// alert(offset);
+	//
+	// alert(moment($('#haystack_from').val()).toDate().getTime()
+	// - (offset * 60 * 1000));
+	var haystack_from = moment($('#haystack_from').val()).toDate().getTime()
+			- (offset * 60 * 1000);
+	var haystack_until = moment($('#haystack_until').val()).toDate().getTime()
+			- (offset * 60 * 1000);
+
+	alert(needle_from + ", " + needle_until + "\n" + haystack_from + ", "
+			+ haystack_until)
+
+	// check if from or until values are invalid
+	if (needle_from >= needle_until || haystack_from >= haystack_until) {
+		alert("Invalid timestamps for haystack or needle!")
+		return
+	}
+	$("body").toggleClass("wait");
+	$('.nav-tabs a[href="#results"]').tab('show');
+
+	// alert(moment(haystack_from).toDate());
+	// var haystack_from = moment($('#haystack_from').val()).toDate().getTime();
+	// var haystack_until =
+	// moment($('#haystack_until').val()).toDate().getTime();
 
 	// var haystack_from = Math.min.apply(null, haystack_from_all) * 1000;
 	// var haystack_until = Math.max.apply(null, haystack_until_all) * 1000;
@@ -625,7 +653,6 @@ function startSAX() {
 		var missing_values = $('#missingValues').find("option:selected").val();
 		var no_best_hits = $('#no_best_hits').find("option:selected").val();
 
-
 		$.ajax({
 			type : "GET",
 			url : "/bayeos-sax/rest/app/GetSaxIndex/" + aggr_int_id + "/"
@@ -634,12 +661,16 @@ function startSAX() {
 			success : function(data) {
 				sax_index = data;
 
-				startSimilaritySearch(needle_id, needle_description, needle_from,
-						needle_until, haystack_ids, haystack_descriptions,
-						haystack_from, haystack_until, sax_index, aggr_int,
-						aggr_int_id, shiftby, missing_values, no_best_hits,
-						distanceTable_id, distanceTable_name);
-
+				startSimilaritySearch(needle_id, needle_description,
+						needle_from, needle_until, haystack_ids,
+						haystack_descriptions, haystack_from, haystack_until,
+						sax_index, aggr_int, aggr_int_id, shiftby,
+						missing_values, no_best_hits, distanceTable_id,
+						distanceTable_name);
+			},
+			error : function() {
+				alert("Error whilst retrieving properties")
+				$("body").toggleClass("wait");
 			}
 		});
 	} else {
@@ -678,13 +709,13 @@ function startSAX() {
 			dataType : "json",
 			success : function(data) {
 
-				startSimilaritySearch(needle_id, needle_description, needle_from,
-						needle_until, haystack_ids, haystack_descriptions,
-						haystack_from, haystack_until, data.sax_index,
-						data.aggr_int.seconds, data.aggr_int.id,
-						data.shift_by.description, data.missing_values,
-						data.no_best_hits, data.dist_func.id,
-						data.dist_func.description);
+				startSimilaritySearch(needle_id, needle_description,
+						needle_from, needle_until, haystack_ids,
+						haystack_descriptions, haystack_from, haystack_until,
+						data.sax_index, data.aggr_int.seconds,
+						data.aggr_int.id, data.shift_by.description,
+						data.missing_values, data.no_best_hits,
+						data.dist_func.id, data.dist_func.description);
 			}
 		});
 
@@ -697,10 +728,11 @@ function startSAX() {
 
 }
 
-function startSimilaritySearch(needle_id, needle_description, needle_from, needle_until,
-		haystack_ids, haystack_descriptions, haystack_from, haystack_until,
-		sax_index, aggr_int, aggr_int_id, shiftby, missing_values,
-		no_best_hits, distanceTable_id, distanceTable_name) {
+function startSimilaritySearch(needle_id, needle_description, needle_from,
+		needle_until, haystack_ids, haystack_descriptions, haystack_from,
+		haystack_until, sax_index, aggr_int, aggr_int_id, shiftby,
+		missing_values, no_best_hits, distanceTable_id, distanceTable_name) {
+	alert("test");
 	$
 			.ajax({
 				type : "GET",

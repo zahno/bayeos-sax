@@ -92,16 +92,17 @@ public class Sax {
 	 * @return A SaxResult object containing the best x hits along with the
 	 *         euclidean distance to each subsequence
 	 */
-	public static SaxResult similaritySearch(int needle_id, String needle_description, DateTime needle_from, DateTime needle_until,
-			int[] haystack_ids, String[] haystack_descriptions, DateTime[] haystack_from, DateTime[] haystack_until,
-			int sax_index, int aggr_int_seconds, String aggr_int_string, int shift_by_indices,
-			String shiftby_description, double missing_values, int no_best_hits,
+	public static SaxResult similaritySearch(int needle_id, String needle_description, DateTime needle_from,
+			DateTime needle_until, int[] haystack_ids, String[] haystack_descriptions, DateTime[] haystack_from,
+			DateTime[] haystack_until, int sax_index, int aggr_int_seconds, String aggr_int_string,
+			int shift_by_indices, String shiftby_description, double missing_values, int no_best_hits,
 			HashMap<MirroredTuple<Character, Character>, Double> sax_distances, int distanceTable_id,
 			String distanceTable_name, int compression_factor) {
 
 		log.info("Starting SAX similarity search. Shift window by " + shift_by_indices + " indizes \n\tNeedle: [ID: "
-				+ needle_id + ", from " + needle_from + " until " + needle_until + "]\n\tHaystack: [ID: " + haystack_ids
-				+ ", from " + haystack_from + " until " + haystack_until + "]");
+				+ needle_id + ", from " + needle_from.toString() + " until " + needle_until.toString()
+				+ "]\n\tHaystack: [ID: " + haystack_ids + ", from " + haystack_from.toString() + " until "
+				+ haystack_until.toString() + "]");
 
 		SaxDistanceFunction distanceFunction = new SaxDistanceFunction(distanceTable_id, distanceTable_name);
 

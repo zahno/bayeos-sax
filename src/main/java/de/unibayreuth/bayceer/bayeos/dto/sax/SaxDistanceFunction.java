@@ -79,4 +79,8 @@ public class SaxDistanceFunction {
 		this.type = type;
 	}
 
+	@Override
+	public String toString() {
+		return "DistanceFunction: description = "+description+", id = "+id;
+	}
 }

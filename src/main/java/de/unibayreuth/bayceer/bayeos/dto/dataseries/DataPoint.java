@@ -37,5 +37,10 @@ public class DataPoint implements Comparable<DataPoint>  {
 	public int compareTo(DataPoint o) {
 		return ((Long) x).compareTo((Long) o.x);
 	}
+	
+	@Override
+	public String toString() {
+		return "DataPoint: x = "+x+", y = "+y;
+	}
 
 }

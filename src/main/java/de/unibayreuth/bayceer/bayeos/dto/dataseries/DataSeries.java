@@ -36,5 +36,10 @@ public class DataSeries {
 		this.data = data;
 		Collections.sort(this.data);
 	}
+	
+	@Override
+	public String toString() {
+		return "DataSeries : Name = "+name+", data = "+data;
+	}
 
 }

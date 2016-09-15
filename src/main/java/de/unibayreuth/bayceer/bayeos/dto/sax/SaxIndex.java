@@ -17,6 +17,10 @@ public class SaxIndex {
 		this.description = description;
 	}
 
+	public SaxIndex() {
+
+	}
+
 	public String getDescription() {
 		return description;
 	}

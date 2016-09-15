@@ -1,5 +1,7 @@
 package de.unibayreuth.bayceer.bayeos.util;
 
+import java.io.Serializable;
+
 /**
  * Tuple where the order of X and Y doesn't matter
  * @author christiane-goehring
@@ -7,7 +9,11 @@ package de.unibayreuth.bayceer.bayeos.util;
  * @param <X>
  * @param <Y>
  */
-public class MirroredTuple<X, Y> {
+public class MirroredTuple<X, Y> implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5815104369532484846L;
 	public final X x;
 	public final Y y;
 

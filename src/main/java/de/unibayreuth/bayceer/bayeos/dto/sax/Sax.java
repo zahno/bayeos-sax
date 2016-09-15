@@ -1,4 +1,4 @@
-package de.unibayreuth.bayceer.bayeos.sax;
+package de.unibayreuth.bayceer.bayeos.dto.sax;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -10,14 +10,6 @@ import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.Period;
 
-import de.unibayreuth.bayceer.bayeos.dto.sax.ResultCollection;
-import de.unibayreuth.bayceer.bayeos.dto.sax.SaxAggregationInterval;
-import de.unibayreuth.bayceer.bayeos.dto.sax.SaxDistance;
-import de.unibayreuth.bayceer.bayeos.dto.sax.SaxDistanceFunction;
-import de.unibayreuth.bayceer.bayeos.dto.sax.SaxProperties;
-import de.unibayreuth.bayceer.bayeos.dto.sax.SaxResult;
-import de.unibayreuth.bayceer.bayeos.dto.sax.SaxSeries;
-import de.unibayreuth.bayceer.bayeos.dto.sax.SaxShiftBy;
 import de.unibayreuth.bayceer.bayeos.servlet.ServletInitializer;
 import de.unibayreuth.bayceer.bayeos.util.MirroredTuple;
 

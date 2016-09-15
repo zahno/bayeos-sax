@@ -17,6 +17,10 @@ public class SaxDistanceFunction {
 	public static final int MINDIST = 1;
 	public static final int MAXDIST = 2;
 
+	public SaxDistanceFunction() {
+
+	}
+
 	public SaxDistanceFunction(int id, String description) {
 		this.id = id;
 		this.description = description;
@@ -81,6 +85,6 @@ public class SaxDistanceFunction {
 
 	@Override
 	public String toString() {
-		return "DistanceFunction: description = "+description+", id = "+id;
+		return "DistanceFunction: description = " + description + ", id = " + id;
 	}
 }

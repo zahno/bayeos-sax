@@ -17,6 +17,10 @@ public class SaxDistance implements Comparable<SaxDistance> {
 		this.haystack_subsequence = haystack;
 		this.distance = mindist;
 	}
+	
+	public SaxDistance(){
+		
+	}
 
 	public SaxSeries getHaystack_subsequence() {
 		return haystack_subsequence;

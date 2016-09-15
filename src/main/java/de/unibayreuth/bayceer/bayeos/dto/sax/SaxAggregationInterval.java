@@ -14,6 +14,10 @@ public class SaxAggregationInterval {
 	// the interval in seconds
 	private int seconds;
 
+	public SaxAggregationInterval(){
+		
+	}
+	
 	public SaxAggregationInterval(int aggr_int_id, String aggr_int_description) {
 		this.setDescription(aggr_int_description);
 		this.setId(aggr_int_id);

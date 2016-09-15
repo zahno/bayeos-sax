@@ -622,9 +622,6 @@ function startSAX() {
 	var haystack_until = moment($('#haystack_until').val()).toDate().getTime()
 			- (offset * 60 * 1000);
 
-	alert(needle_from + ", " + needle_until + "\n" + haystack_from + ", "
-			+ haystack_until)
-
 	// check if from or until values are invalid
 	if (needle_from >= needle_until || haystack_from >= haystack_until) {
 		alert("Invalid timestamps for haystack or needle!")
@@ -712,7 +709,7 @@ function startSAX() {
 				startSimilaritySearch(needle_id, needle_description,
 						needle_from, needle_until, haystack_ids,
 						haystack_descriptions, haystack_from, haystack_until,
-						data.sax_index, data.aggr_int.seconds,
+						data.sax_index.saxIndex, data.aggr_int.seconds,
 						data.aggr_int.id, data.shift_by.description,
 						data.missing_values, data.no_best_hits,
 						data.dist_func.id, data.dist_func.description);
@@ -732,7 +729,6 @@ function startSimilaritySearch(needle_id, needle_description, needle_from,
 		needle_until, haystack_ids, haystack_descriptions, haystack_from,
 		haystack_until, sax_index, aggr_int, aggr_int_id, shiftby,
 		missing_values, no_best_hits, distanceTable_id, distanceTable_name) {
-	alert("test");
 	$
 			.ajax({
 				type : "GET",

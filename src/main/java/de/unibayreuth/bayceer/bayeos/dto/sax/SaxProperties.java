@@ -14,26 +14,30 @@ public class SaxProperties {
 	private SaxAggregationInterval aggr_int;
 	private SaxShiftBy shift_by;
 	private SaxDistanceFunction dist_func;
-	private int sax_index;
+	private SaxIndex sax_index;
 	private double missing_values;
 	private int no_best_hits;
+
+	public SaxProperties() {
+
+	}
 
 	public SaxProperties(SaxAggregationInterval aggr_int, SaxShiftBy shift_by, SaxDistanceFunction dist_func,
 			int sax_index, double missing_values, int no_best_hits) {
 		this.setAggr_int(aggr_int);
 		this.setShift_by(shift_by);
 		this.setDist_func(dist_func);
-		this.sax_index = sax_index;
+		this.sax_index = new SaxIndex(sax_index, null);
 		this.missing_values = missing_values;
 		this.no_best_hits = no_best_hits;
 	}
 
-	public int getSax_index() {
+	public SaxIndex getSax_index() {
 		return sax_index;
 	}
 
 	public void setSax_index(int sax_index) {
-		this.sax_index = sax_index;
+		this.sax_index = new SaxIndex(sax_index, null);
 	}
 
 	public double getMissing_values() {

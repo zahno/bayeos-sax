@@ -16,6 +16,10 @@ public class SaxShiftBy implements Comparable<SaxShiftBy> {
 	private int indices;
 	private int seconds;
 
+	public SaxShiftBy(){
+		
+	}
+	
 	public SaxShiftBy(int shiftby_indices, String description) {
 		this.indices = shiftby_indices;
 		this.description = description;

@@ -3,6 +3,12 @@
 
 	<h3>${project.name}${project.version}</h3>
 	<br>
+	<br> 0.0.10-SNAPSHOT:
+	<br> Added default constructors (for JUnit testing)
+	<br>
+	<br> 0.0.9-SNAPSHOT:
+	<br> Removed useless alerts and added SaxIndex as an object to SaxProperties instead of an integer.
+	<br>
 	<br> 0.0.8-SNAPSHOT:
 	<br> Implemented automatic adjustment of time zones
 	<br>

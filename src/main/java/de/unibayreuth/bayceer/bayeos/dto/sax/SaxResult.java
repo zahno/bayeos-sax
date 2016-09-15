@@ -14,6 +14,10 @@ public class SaxResult {
 	private SaxDistance[] haystack_subsequences;
 	private SaxProperties properties;
 
+	public SaxResult(){
+		
+	}
+	
 	public SaxResult(SaxSeries needle, SaxDistance[] haystack_subsequences, SaxProperties properties) {
 		super();
 		this.needle = needle;

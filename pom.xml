@@ -1,13 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-	<!-- To build the war for production call: mvn clean package -DskipTests -P prod -->
+	<!-- To build the war for production call: mvn clean package -DskipTests 
+		-P prod -->
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.unibayreuth.bayceer.bayeos</groupId>
 	<artifactId>bayeos-sax</artifactId>
 	<packaging>war</packaging>
-	<version>0.0.8-SNAPSHOT</version>
+	<version>0.0.10-SNAPSHOT</version>
 	<name>BayEOS SAX Rest Service</name>
 
 	<licenses>
@@ -81,6 +82,7 @@
 			<version>${jersey.version}</version>
 		</dependency>
 
+
 		<dependency>
 			<groupId>org.glassfish.jersey.ext</groupId>
 			<artifactId>jersey-bean-validation</artifactId>
@@ -128,7 +130,11 @@
 			<artifactId>joda-time</artifactId>
 			<version>2.9.3</version>
 		</dependency>
-
+<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-joda</artifactId>
+			<version>2.4.0</version>
+		</dependency>
 
 
 

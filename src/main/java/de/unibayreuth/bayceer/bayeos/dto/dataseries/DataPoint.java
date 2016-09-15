@@ -16,6 +16,10 @@ public class DataPoint implements Comparable<DataPoint>  {
 		this.x = x;
 		this.y = y;
 	}
+	
+	public DataPoint(){
+		
+	}
 
 	public long getX() {
 		return x;

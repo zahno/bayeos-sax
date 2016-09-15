@@ -5,6 +5,7 @@ import java.util.List;
 
 /**
  * Represents a time series with a name and a list of data points
+ * 
  * @author christiane-goehring
  *
  */
@@ -12,6 +13,9 @@ public class DataSeries {
 
 	String name;
 	List<DataPoint> data;
+	
+	public DataSeries() {
+	}
 
 	public DataSeries(String name, List<DataPoint> data) {
 		this.name = name;
@@ -36,10 +40,10 @@ public class DataSeries {
 		this.data = data;
 		Collections.sort(this.data);
 	}
-	
+
 	@Override
 	public String toString() {
-		return "DataSeries : Name = "+name+", data = "+data;
+		return "DataSeries : Name = " + name + ", data = " + data;
 	}
 
 }
